@@ -1,0 +1,7 @@
+TEAM: Hanette Le & Allen Yabut
+
+Search Approach:
+We started with creating the simpliest A* star program using the pseudocode from one of our earliest reading. We created dictionaries to keep track of cost, backpointers, and actions, and lists to keep track of our queue and visited states. After, we tried our best to clean the search function up by removing our double for-loops, unneccessary while loops, changing visited to be a set since order didn't matter. Majority of our time was spent on trying to figure how to make search run faster and optimized our search.
+
+Heuristic Approach:
+Before we even started programming, we drew diagrams and orders of how the potiential steps would be to optimized our search. We decided that if we had better alternative of obtaining items, we would ensure that the less optimized options would return a high cost number. By doing so, it would be on one of the last options in the A* search and allow it to narrow closer to our goal. We also wanted to attempt the extra credit with backward search but didn't have the time to do it, but we were inspired by the back search to create a helper function that would be similar. Instead, it starts from the goal and will let us know all the items we need so we can narrow our heuristic to not stray to the wrong path.

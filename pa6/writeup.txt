@@ -1,0 +1,177 @@
+P6: Hanette Le & Andrew Nguyen
+We will NOT participate in the competition.
+
+Individual_Grid ======================================================
+
+Selection Strategies Used:
+In our selection strategies, we remove the last two levels generated.
+
+We use a very small elite selection in the very beginning
+Here, we take the levels with the highest fitness and generate a child from there.
+
+The next selection we use is tournament selection. Here, we choose two different levels to make parents.
+We do this by comparing 24 different potential parents from the population and take the one with the best fitness
+from them. After checking and making sure that these two are not the same parent, we generate a child from them and 
+add the child to the population.
+
+The next selection strategy we use is ranked selection. Again, we choose two different levels to make parents.
+We choose the parents by assigning each level a rank and from there adding x amount to a list depending on the ranking.
+For example, if it was a population of 100, the worst ranking parent would have be added to a list one time and the 
+100th parent/the best ranking one would be added to a list 100 times. From there we would randomly choose 2 parents 
+from the list and generate a child from them. From there, the child is added to the population and the whole population is 
+returned with two new children added and the worst two levels removed.
+
+
+
+Crossover used: -----------------------------------------------------
+The crossover used is 3 point crossover and it returns one mutated child. 
+
+First, it copies over self.genome into new_genome
+
+After taking 3 points, the code makes sure that we don't grab 3 of the same point. After grabbing 3 points and ordering 
+them, the code then loops through each x and y in self.genome. From there, depending on the x value it will either keep
+the self.genome or copy over it with other.genome.
+
+For new_genome, it will be the same from the left most value to the first point. After, it will take on the values of others
+until it reaches the second point. Continuing, it then takes on the values of self until it reaches the third point. After 
+reaching the third point, it will copy the rest of other until it reaches the end.
+
+After copying it over, the code will then return a mutated child.
+
+
+
+Mutation used: -----------------------------------------------------
+Our mutate was a little more complex in terms of how it works. It goes through a double for-loop starting from height (the ground) and iterates through each individual grid block. Our mutation rate was at 40% but also includes another percentage variable to determine what will change.
+
+Floor - If it's within 40% mutation rate and 5% chance on choice variable, then it will create a hole of a random length of 2-3.
+
+Ground Blocks - ROUTE 1: If below contains a ground block and is within mutation rate, then it has a 20% chance of spawning another ground block. ROUTE 2: If below contains a ground block and is within mutation rate, and the block bottom-left is also a ground block, it has a 30% to build a ground block (potentially a hill).
+
+Enemy - If below contains a ground block and is within mutation rate AND ground blocks conditions aren't met, it has a 20% chance to spawn an enemy.
+
+Pipe Tube (Starter) - If below contains a ground block and is within mutation rate AND ground blocks conditions aren't met, then it has a 5% chance of starting a pipe. The pipe conditions also check if the block on the bottom-right is a ground to ensure there is no floating pipes.
+
+Pipe Tube/Closer (Continue and Close) - If below contains a pipe block and passes a 50% chance rate, it will make another pipe block. It will build up to a random height pipe between 1-3 blocks tall or until the 50% chance rate fails and closes the pipe with the Pipe Top block.
+
+Platforms - We restraint our platforms to spawn with the height around the middle of the map. The constraint is there must be 3 air blocks consecutively below AND 3 air blocks consectively on the left side of the block to help spawn less unclimbable platforms. Within those conditions, if it is within mutation rates and under 3% chance rate, it will have a 33% of spawning either a ? block, mushroom block, or breakable block. Platforms will be 3-4 long.
+
+Coins - If none of the individual grid falls within the category above, it was a 5% chance if it passes the mutation rate to spawn a coin block.
+
+
+Changes to Fitness: ------------------------------------------------
+In calculating the fitness, we changed some of the coefficients used.
+
+meaningfulJumpVariance=1 - did this to make sure that there's platforming involved in the game and it's not just a
+straight line to the goal
+
+jumps=1 - same as above, reward having jumps in the level and so it the level isn't too linear
+
+leniency=.5 - if there are enemies and jumps, make sure that there's power up and coins spawned in as well
+
+decorationPercentage=.5 - to promote having variety and more decorations in the level
+
+solvability=5 - to make sure that the level is solvable 
+
+==================================================================================================================================
+Individual_DE
+
+How crossover works for DE: -------------------------------------------
+It first takes 2 points, one between the length of self.genome and the other between 0 and the length of other.genome.
+
+This is basically 1 point crossover, but it happens twice. The points are taken and split the genomes, with
+ga returning the first half of self.genome and the second half of other.genome. The other halves are taken by gb,
+with it returning the first half of other.genome and the second half of self.genome.
+
+For example:
+If these were our two genomes
+Self:
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Other:
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+The function would find two points and for this example let's assume that they return pa = 5 and pb = 15.
+The point in self would be here:
+     |
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+The point in other would be here:
+               |   
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+Each half looks like:
+xxxxx - part a.1
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx - part a.2
+
+aaaaaaaaaaaaaaa - part b.1
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaa - part b.2
+
+Taking those halves, ga(part a.1 + part b.2) would look like:
+xxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+and gb(part b.1 + part a.2) would look like:
+aaaaaaaaaaaaaaaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+From there, the crossover is complete and it returns the two children.
+
+
+
+How mutate works for DE: -----------------------------------------------
+The mutation rate for mutate in the DE is 10%. If that 10% is taken and the len(new_genome) is > 0, 
+it takes a block to change from choosing from 0 to the len(new_genome) - 1.
+
+From there, it takes the the information of the block and what type it is. Depending on what block type, it will change
+how the block can be edited.
+
+If the block is a 4_block, it can either be moved horizontally, vertically, or changes if it's breakable or not.
+
+If the block is a 5_qblock, it can either be moved horizontally, vertically, or change if it has a power up or not.
+
+If the block is a 3_coin, it can either be moved horizontally or vertically.
+
+If the block is a 7_pipe, it can either be moved horizontally or the height is changed.
+
+If the block is a 0_hole, it can either be moved horizontally or have its width changed.
+
+If the block is a 6_stairs, it can either be moved horizontally, have its height changed, or have the direction changed.
+
+If the block is a 1_platform, it can either be moved horizontally, vertically, made wider, or change what the platform is made of.
+
+If the block is a 2_enemy, nothing changes.
+
+After that, it removes the block that's there and adds the modified one in and returns the genome.
+
+
+
+Changes in mutate: -------------------------------------------------------------
+
+We adjusted the height for 7_pipe to allow the pipes to change into shorter pipe using a random generator to make it 1-4 tall.  Along with 7_pipe's height, we changed the changes of moving x to 25% and 75% for changing the pipe's height.
+
+For 6_stairs, we lowered its offset and check if the stairs will be reversed or not. If the stairs are reverse, then we change its height to be smaller so Mario would be able to jump over.
+
+
+Changes in fitness: -------------------------------------------------------------
+
+In calculating the fitness, we changed some of the coefficients and variables used.
+
+meaningfulJumpVariance=1 - did this to make sure that there's platforming involved in the game and it's not just a
+straight line to the goal
+
+jumps=1 - same as above, reward having jumps in the level and so it the level isn't too linear
+
+leniency=.5 - if there are enemies and jumps, make sure that there's power up and coins spawned in as well
+
+decorationPercentage=.5 - to promote having variety and more decorations in the level
+
+solvability=5 - to make sure that the level is solvable 
+
+=========================================================================================================================
+FAVORITE LEVELS:
+
+#1
+Reasons: Platforms gave two routes on getting through each obstacle (either climb above the platforms or go over pipes). Most mushroom that spawn fell between two ground blocks, making it unable to fall off the map which was also satisfying to see.
+Generation: 4
+Time: 12 seconds
+
+#2
+Reasons: Our second favorite level was due to its chaotic platform spawns and countless of holes on the floor. The map ended up slightly cramped but it was fun to race to see who can get to the end without falling, dying, missing their jump, etc. We ended up fixing the mutation rates after this but it was still enjoyable.
+Generation: 1
+Time: 4 seconds
